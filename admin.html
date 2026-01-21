@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Admin – Đấu Trường 100</title>
+<script src="firebase.js"></script>
+</head>
+<body>
+<h2>ADMIN PANEL</h2>
+
+
+Mã phòng: <input id="room" value="123456"><br><br>
+
+
+<button onclick="setAnswer('A')">Đáp án A</button>
+<button onclick="setAnswer('B')">Đáp án B</button>
+<button onclick="setAnswer('C')">Đáp án C</button><br><br>
+
+
+<button onclick="startGame()">▶ Bắt đầu 6 giây</button>
+
+
+<h3>Danh sách người chơi</h3>
+<ul id="list"></ul>
+
+
+<script>
+const roomCode = document.getElementById('room').value
+
+
+function setAnswer(ans){
+db.ref('rooms/'+roomCode+'/correct').set(ans)
+alert('Đáp án đúng: '+ans)
+}
+
+
+function startGame(){
+db.ref('rooms/'+roomCode+'/timer').set(6)
+}
+
+
+db.ref('rooms/'+roomCode+'/players').on('value', snap=>{
+list.innerHTML=''
+snap.forEach(p=>{
+const d=p.val()
+list.innerHTML+=`<li>${d.name} | ${d.discord} | Ghế ${d.seat} | ${d.answer||''} | ${d.status}</li>`
+})
+})
+</script>
+</body>
+</html>
