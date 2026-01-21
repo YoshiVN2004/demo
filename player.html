@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Player – Đấu Trường 100</title>
+<script src="firebase.js"></script>
+</head>
+<body>
+<h2>NGƯỜI CHƠI</h2>
+
+
+<input id="name" placeholder="Tên"><br>
+<input id="discord" placeholder="Discord ID"><br>
+<input id="seat" placeholder="Ghế 000-100"><br>
+<input id="room" placeholder="Mã phòng"><br>
+<button onclick="login()">Đăng nhập</button>
+
+
+<h3 id="timer"></h3>
+<button onclick="answer('A')">A</button>
+<button onclick="answer('B')">B</button>
+<button onclick="answer('C')">C</button>
+
+
+<script>
+let playerKey, roomCode
+
+
+function login(){
+roomCode = room.value
+const s = seat.value
+
+
+db.ref(`rooms/${roomCode}/seats/${s}`).get().then(r=>{
+if(r.exists()){ alert('Ghế đã có người!'); return }
+
+
+playerKey = db.ref('rooms/'+roomCode+'/players').push().key
+db.ref('rooms/'+roomCode+'/players/'+playerKey).set({
+name:name.value,
+discord:discord.value,
+seat:s,
+status:'Đang chơi'
+})
+
+
+db.ref(`rooms/${roomCode}/seats/${s}`).set(true)
+})
+}
+
+
+function answer(ans){
+db.ref('rooms/'+roomCode+'/players/'+playerKey+'/answer').set(ans)
+}
+
+
+// TIMER
+db.ref('rooms/'+roomCode+'/timer').on('value', snap=>{
+let t = snap.val()
+if(t>0){
+timer.innerText = '⏱ '+t
+setTimeout(()=>db.ref('rooms/'+roomCode+'/timer').set(t-1),1000)
+}
+})
+</script>
+</body>
+</html>
